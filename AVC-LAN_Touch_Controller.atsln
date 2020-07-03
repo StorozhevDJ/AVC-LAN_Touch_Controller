@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "AVC-LAN_Touch_Controller", "AVC-LAN_Touch_Controller.cppproj", "{BFB9382D-A1DF-470E-941A-C3203287BB72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFB9382D-A1DF-470E-941A-C3203287BB72}.Debug|AVR.ActiveCfg = Debug|AVR
+		{BFB9382D-A1DF-470E-941A-C3203287BB72}.Debug|AVR.Build.0 = Debug|AVR
+		{BFB9382D-A1DF-470E-941A-C3203287BB72}.Release|AVR.ActiveCfg = Release|AVR
+		{BFB9382D-A1DF-470E-941A-C3203287BB72}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,317 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.2</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.CPP</ToolchainName>
+    <ProjectGuid>{bfb9382d-a1df-470e-941a-c3203287bb72}</ProjectGuid>
+    <avrdevice>ATmega32U4</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>CPP</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>AVC-LAN_Touch_Controller</AssemblyName>
+    <Name>AVC-LAN_Touch_Controller</Name>
+    <RootNamespace>AVC-LAN_Touch_Controller</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress />
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue />
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>1</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.21.0" />
+  </dependencies>
+</framework-data>
+    </AsfFrameworkConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>NDEBUG</Value>
+      <Value>USE_LUFA_CONFIG_HEADER</Value>
+      <Value>F_CPU=16000000UL</Value>
+      <Value>F_USB=16000000UL</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>NDEBUG</Value>
+      <Value>F_CPU=16000000UL</Value>
+    </ListValues>
+  </avrgcccpp.compiler.symbols.DefSymbols>
+  <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+  <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+  <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+  <avrgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcccpp.linker.libraries.Libraries>
+</AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGccCpp>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>USE_LUFA_CONFIG_HEADER</Value>
+      <Value>F_CPU=16000000UL</Value>
+      <Value>F_USB=16000000UL</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../TouchUSB</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcccpp.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>byte=char</Value>
+      <Value>word=short</Value>
+      <Value>F_CPU=16000000UL</Value>
+    </ListValues>
+  </avrgcccpp.compiler.symbols.DefSymbols>
+  <avrgcccpp.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../AVC-LAN</Value>
+    </ListValues>
+  </avrgcccpp.compiler.directories.IncludePaths>
+  <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
+  <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+  <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
+  <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+  <avrgcccpp.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcccpp.linker.libraries.Libraries>
+  <avrgcccpp.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcccpp.assembler.debugging.DebugLevel>
+</AvrGccCpp>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AVC-LAN\AVCLanDrv\AVCLanDrv.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\AVCLanDrv\AVCLanDrv.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\AVCLanDrv\config.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\AVCLanDVDch\AVCLanDVDch.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\AVCLanDVDch\AVCLanDVDch.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\BuffSerial\BuffSerial.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\BuffSerial\BuffSerial.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN\Navi_DVD_AVin.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AVC-LAN_Touch_Controller.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\buffers.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\buffers.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\commands.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\commands.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\Descriptors.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\Descriptors.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFAConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Class\Common\HIDClassCommon.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Class\Device\CDCClassDevice.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Class\Device\CDCClassDevice.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Class\Device\HIDClassDevice.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Class\Device\HIDClassDevice.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\Device_AVR8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\Device_AVR8.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\EndpointStream_AVR8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\EndpointStream_AVR8.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\Endpoint_AVR8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\Endpoint_AVR8.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\USBController_AVR8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\USBController_AVR8.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\USBInterrupt_AVR8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\USBInterrupt_AVR8.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\ConfigDescriptors.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\ConfigDescriptors.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\Device.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\DeviceStandardReq.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\DeviceStandardReq.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\Events.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\Events.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\Host.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\HostStandardReq.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\HostStandardReq.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\USBTask.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\Core\USBTask.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\LUFA\Drivers\USB\USB.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\restouch.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\restouch.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\TouchController.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TouchUSB\TouchController.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AVC-LAN" />
+    <Folder Include="AVC-LAN\AVCLanCDch" />
+    <Folder Include="AVC-LAN\AVCLanDrv" />
+    <Folder Include="AVC-LAN\AVCLanDVDch" />
+    <Folder Include="AVC-LAN\AVCLanNavi" />
+    <Folder Include="AVC-LAN\BuffSerial" />
+    <Folder Include="TouchUSB" />
+    <Folder Include="TouchUSB\LUFA" />
+    <Folder Include="TouchUSB\LUFA\Common" />
+    <Folder Include="TouchUSB\LUFA\Drivers" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Class" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Class\Common" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Class\Device" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Core" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8" />
+    <Folder Include="TouchUSB\LUFA\Drivers\USB\Core\AVR8\Template" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AVC-LAN\AVCLanDrv\changelog.txt">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="AVC-LAN\AVCLanDVDch\changelog.txt">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="AVC-LAN\BuffSerial\changelog.txt">
+      <SubType>compile</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>

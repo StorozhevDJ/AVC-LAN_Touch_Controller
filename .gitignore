@@ -1,0 +1,6 @@
+#Binaries
+Debug/
+Release/
+
+#User Specific Files
+*.atsuo
