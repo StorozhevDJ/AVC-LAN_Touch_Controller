@@ -171,14 +171,16 @@ uint32_t testc=0, testt=0;
 //работа с сенсорным экраном
 bool rtTouchTask()
 {
+/*//Test touch
 if (++testc>1000)
 	{
 	testc=0;
+	adc_x++;
+	adc_y++;
 	if ((++testt%100)==0)
 		{
-		adc_x++;
-		adc_y++;
-		touched= true;
+		
+		//touched= true;
 		LEDOFF(LEDTOUCH,LEDTOUCH_TOUCH);
 		}
 	else
@@ -188,9 +190,9 @@ if (++testc>1000)
 		}
 	return touched;
 	}
-else return touched;
+else return touched;*/
 
-uint8_t newx;
+/*uint8_t newx;
 	uint8_t newy;
 	
 	//переключение в режим проверки наличия касание
@@ -234,7 +236,7 @@ uint8_t newx;
 		
 		touched = false;
 	}
-	return touched;
+	return touched;*/
 }
 
 

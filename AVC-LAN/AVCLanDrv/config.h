@@ -46,25 +46,27 @@
 
 #endif
 
+
+
 //********** arduino & driver based on PCA82C250 **********
 #ifdef AVCLAN_PCA82C250
-#define AVCLANDRIVER_TYPE    "Arduino - PCA82C250"
+#define AVCLANDRIVER_TYPE    "PCA82C250 + LM393 on Ardiuno Pro Micro"
 // define out pin (pin 8 arduino) for AVCLAN_PCA82C250
-#define DATAOUT_DDR	DDRB
-#define DATAOUT_PORT	PORTB
-#define	DATAOUT_PIN	PINB
-#define DATAOUT		0
+#define DATAOUT_DDR		DDRF
+#define DATAOUT_PORT	PORTF
+#define	DATAOUT_PIN		PINF
+#define DATAOUT			6
 
 // define in pin (pin 9 arduino) for AVCLAN_PCA82C250
-#define DATAIN_DDR	DDRB
-#define DATAIN_PORT	PORTB
-#define	DATAIN_PIN	PINB
-#define DATAIN		1
+#define DATAIN_DDR	DDRF
+#define DATAIN_PORT	PORTF
+#define	DATAIN_PIN	PINF
+#define DATAIN		4
 
-// LED connected to digital pin 13
-#define LED_DDR		DDRB
-#define LED_PORT	PORTB
-#define	LED_PIN		PINB
+// LED connected to digital pin 24
+#define LED_DDR		DDRD
+#define LED_PORT	PORTD
+#define	LED_PIN		PIND
 #define LED_OUT		5
 
 // AZFM board activate

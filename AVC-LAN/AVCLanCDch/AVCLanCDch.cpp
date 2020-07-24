@@ -4,7 +4,7 @@
   Version 0.2.2
 */
 
-#include "AVCLanDrv.h"
+#include "AVCLanDrv/AVCLanDrv.h"
 #include "AVCLanCDch.h"
 #include <avr/pgmspace.h>
 

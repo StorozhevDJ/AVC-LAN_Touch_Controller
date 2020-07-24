@@ -11,10 +11,10 @@
 //#include "Arduino.h"
 #include "config.h"
 
-#define AVCLANDRV_VERSION "0.3.1"
+#define AVCLANDRV_VERSION "0.3.1.1"
 
 
-#ifdef AVCLAN_RESISTOR
+/*#ifdef AVCLAN_RESISTOR
 // avclan driver on resistor
 #define INPUT_IS_SET   (ACSR & _BV(ACO))
 #define INPUT_IS_CLEAR (!(ACSR & _BV(ACO)))
@@ -31,7 +31,7 @@
 #define OUTPUT_SET_0   (sbi(DATAOUT_PORT, DATAOUT));
 #define AVC_OUT_EN     (sbi(OUTEN_PORT, OUTEN));; 
 #define AVC_OUT_DIS    (cbi(OUTEN_PORT, OUTEN));;
-#else
+#else*/
 //avclan driver on PCA82C250 & LM239N
 #define INPUT_IS_SET   (bit_is_set(DATAIN_PIN, DATAIN))
 #define INPUT_IS_CLEAR (bit_is_clear(DATAIN_PIN, DATAIN))
@@ -39,17 +39,17 @@
 #define OUTPUT_SET_0   (sbi(DATAOUT_PORT, DATAOUT));
 #define AVC_OUT_EN     ; 
 #define AVC_OUT_DIS    ;
-#endif
-#endif
+//#endif
+//#endif
 
-#define AVC_NORMAL_BIT_LENGTH           	0x4A  // 37 * (F_CPU / 1000000L / 8) 
+#define AVC_NORMAL_BIT_LENGTH           	0x4F  // 39 * (F_CPU / 1000000L / 8) 
 #define AVC_BIT_1_HOLD_ON_LENGTH			0x28  // 20 uS * (F_CPU / 1000000L / 8) 
 #define AVC_BIT_0_HOLD_ON_LENGTH			0x40  // 32 uS * (F_CPU / 1000000L / 8)
-//#define AVC_BIT_0_HOLD_ON_MIN_LENGTH		0x34  // 26 uS * (F_CPU / 1000000L / 8)    Compare half way between a '1' (20 us) and a '0' (32 us ): 32 - (32 - 20) /2 = 26 us
-#define AVC_BIT_0_HOLD_ON_MIN_LENGTH		0x3C  // 30 uS * (F_CPU / 1000000L / 8)    Compare half way between a '1' (20 us) and a '0' (32 us ): 32 - (32 - 20) /2 = 26 us
-#define AVC_START_BIT_LENGTH				0x5D  // 186 uS  * (F_CPU / 1000000L / 32) ,  prescaler 32
-#define AVC_START_BIT_HOLD_ON_LENGTH		0x54  // 168 uS * (F_CPU / 1000000L / 32)    prescaler 32
-#define AVC_START_BIT_HOLD_ON_MIN_LENGTH	0x16  // 44 uS * (F_CPU / 1000000L / 32)      grater that AVC_NORMAL_BIT_LENGTH,  prescaler 32
+#define AVC_BIT_0_HOLD_ON_MIN_LENGTH		0x34  // 26 uS * (F_CPU / 1000000L / 8)    Compare half way between a '1' (20 us) and a '0' (32 us ): 32 - (32 - 20) /2 = 26 us
+//#define AVC_BIT_0_HOLD_ON_MIN_LENGTH		0x3C  // 30 uS * (F_CPU / 1000000L / 8)    Compare half way between a '1' (20 us) and a '0' (32 us ): 32 - (32 - 20) /2 = 26 us
+#define AVC_START_BIT_LENGTH				0x2E  // 186 uS  * (F_CPU / 1000000L / 64) ,  prescaler 64
+#define AVC_START_BIT_HOLD_ON_LENGTH		0x29  // 168 uS * (F_CPU / 1000000L / 64)    prescaler 64
+#define AVC_START_BIT_HOLD_ON_MIN_LENGTH	0x0B  // 44 uS * (F_CPU / 1000000L / 64)      grater that AVC_NORMAL_BIT_LENGTH,  prescaler 64
 #define AVC_1U_LENGTH	                    0x02  // 1 uS * (F_CPU / 1000000L / 8)      
 
 #define AVC_MAXMSGLEN		32

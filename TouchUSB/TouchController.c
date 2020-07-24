@@ -10,6 +10,7 @@
 #include "restouch.h"
 #include "buffers.h"
 
+#include "../AVC-LAN/AVCLanDrv/config.h"
 #include "../AVC-LAN/Navi_DVD_AVin.h"
 
 
@@ -78,24 +79,24 @@ int main(void)
 	int16_t cdcdata;
 	
 	SetupHardware();
-	//AVCLan_Setup();
+	AVCLan_Setup();
 	
 	usemouse = true;
 	
     while(1)
     {
-		//AVCLan_Task();
+		AVCLan_Task();
 		
 		//задачи сенсорного экрана	
-		//rtTouchTask();
+		rtTouchTask();
 
 		//получение байтов по виртуалному последовательному порту и передача их диспетчеру комманд
-        cdcdata=CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
-		if (cdcdata>=0) {
-			cdcdata=cmdByte(cdcdata);
+        //cdcdata=CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
+		//if (cdcdata>=0) {
+			//cdcdata=cmdByte(cdcdata);
 			//если диспетчер вернул положительное число, отправляем его в виртуальный последовательный порт
-			if (cdcdata>=0) CDC_Device_SendByte(&VirtualSerial_CDC_Interface, cdcdata);
-		}
+			//if (cdcdata>=0) CDC_Device_SendByte(&VirtualSerial_CDC_Interface, cdcdata);
+		//}
 
 		//задачи USB
 		CDC_Device_USBTask(&VirtualSerial_CDC_Interface);
@@ -109,6 +110,10 @@ int main(void)
 
 void SetupHardware()
 {
+	//LED port Init
+	DDRB |= (1<<0);	
+	DDRD |= (1<<5);
+	
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
@@ -192,8 +197,10 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 
 	if (usemouse) {
 		//вычисляем координаты в диапазоне 0..32767
-		DigitizerReport->X=(cdata.kx*(adc_x-cdata.dx))>>16;
-		DigitizerReport->Y=(cdata.ky*(adc_y-cdata.dy))>>16;
+		//DigitizerReport->X=(cdata.kx*(adc_x-cdata.dx))>>16;
+		//DigitizerReport->Y=(cdata.ky*(adc_y-cdata.dy))>>16;
+		DigitizerReport->X=(uint16_t)(adc_x)<<7;
+		DigitizerReport->Y=(uint16_t)(adc_y)<<7;
 		//косание
 		if (touched) {
 			//if (WF_PIN&WF_MASK)
@@ -202,7 +209,7 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 			}
 			//else
 			{
-			//	DigitizerReport->Button=0b110001; //так работает в Винде
+				//DigitizerReport->Button=0b110001; //так работает в Винде
 			}
 		}		
 	}

@@ -1,6 +1,7 @@
 /*
   BuffSerial.h - serial with transmit buffer library for Wiring
   Created by Kochetkov Aleksey, 28.11.2009
+  Edit by Storozhev Denis 09/07/2020
   Version 0.1.2
 */
 #include <avr/pgmspace.h>
@@ -8,20 +9,19 @@
 #ifndef BuffSerial_h
 #define BuffSerial_h
 
-//#include "WProgram.h"
-//#include "Arduino.h"
-
 #define TX_BUFF_SIZE		240               // max 65535 
 #define RX_BUFF_SIZE		25                // max 255
 #define TX_BUFF_MAX_LEN		TX_BUFF_SIZE - 1
-#define BUFFSERIAL_VERSION "0.1.2"
+#define BUFFSERIAL_VERSION "0.1.2.2"
 
 #ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+	#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif
 #ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+	#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
+
+
 
 class BuffSerial{
 	public:
@@ -33,6 +33,7 @@ class BuffSerial{
 		uint16_t	txEnd;
 		uint8_t		txFull;
 		uint16_t	txOverflow;
+		
 		void		begin(long);
 		void 		sendByte(uint8_t);
 		void		print(const char*);

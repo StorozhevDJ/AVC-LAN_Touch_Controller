@@ -2,6 +2,7 @@
   AVCLanDrv.cpp - AVCLan DVD changer library for 'duino / Wiring
   Created by Kochetkov Aleksey, 04.08.2010
   Modified by Podmoskovny Dmitry, September 2013
+  Edit by Storozhev Denis 23/07/2020
   Version 0.2.4
 */
 
@@ -35,7 +36,7 @@ const AvcInMessageTable  mtMain[] PROGMEM = {
 	{ACT_RANDOM_OFF,     0x04, {0x00, 0x25, 0x43, 0xB1}},
 	{ACT_RANDOM_D_ON,    0x04, {0x00, 0x25, 0x43, 0xB3}},
 	{ACT_RANDOM_D_OFF,   0x04, {0x00, 0x25, 0x43, 0xB4}},
-	{ACT_AM_PRESS,       0x05, {0x00, 0x25, 0x32, 0x80, 0x06}}, // кнопка AM на магнитоле JBL
+	{ACT_AM_PRESS,       0x05, {0x00, 0x25, 0x32, 0x80, 0x06}}, // AM button from JBL radio (кнопка AM на магнитоле JBL)
 
 	// power off 0401015F01
 };
@@ -95,7 +96,9 @@ const AvcOutMessage CmdLanStatus5    PROGMEM =  {AVC_MSG_DIRECT,     0x04, {0x00
 
 
 
-// AVCLan DVDchanger  & timer1 init, 
+/************************************************************************/
+/* AVCLan DVDchanger  & timer1 init,                                    */
+/************************************************************************/
 void AVCLanDVDch::begin(){
 	avclan.deviceAddress = 0x0208;
 	avclan.BoardDeviceAddress = 0x0190;
@@ -113,15 +116,15 @@ void AVCLanDVDch::begin(){
 
 
 
-// Use the last received message to determine the corresponding action ID, store it in avclan object
+/************************************************************************/
+/* Use the last received message to determine the corresponding         */
+/* action ID, store it in avclan object                                 */
+/************************************************************************/
 void AVCLanDVDch::getActionID()
 {
-if (avclan.headAddress == 0)
-	{
+if (avclan.headAddress == 0) {
 	avclan.actionID = avclan.getActionID((AvcInMessageTable *)mtSearchHead, mtSearchHeadSize);
-	}
-else
-{
+	} else {
 	avclan.actionID = avclan.getActionID((AvcInMessageTable *)mtMain, mtMainSize);
 	if (avclan.actionID == ACT_NONE) avclan.actionID = avclan.getActionID((AvcInMaskedMessageTable *)mtMaskedMain, mtMaskedMainSize);
 }
@@ -129,82 +132,94 @@ else
 
 
 
-// process action
+/************************************************************************/
+/* process action                                                       */
+/************************************************************************/
 void AVCLanDVDch::processAction(AvcActionID ActionID){
 	byte r;
-	switch (ActionID){
-		case ACT_REGISTER:                                 // register device
+	switch (ActionID) {
+		// register device
+		case ACT_REGISTER:
 			if (avclan.headAddress == 0) avclan.headAddress = avclan.masterAddress;
 			avclan.sendMessage(&CmdRegister);
-			break;
-		case ACT_INIT:                                     // init device
+		break;
+		// init device
+		case ACT_INIT:
 			r = avclan.sendMessage(&CmdInit1);
 			if (!r) r = avclan.sendMessage(&CmdInit2);
 			if (!r) r = avclan.sendMessage(&CmdInit3);
 			avclan.sendMessage(&CmdInit_0);
-			break;
-		case ACT_DEVSTATUS_E0:                             // Device status E0
+		break;
+		// Device status E0
+		case ACT_DEVSTATUS_E0:
 			r = avclan.message[1];
 			avclan.loadMessage(&CmdDevStatusE0);
 			avclan.message[2] = r;
 			avclan.sendMessage();
-			break;
-		case ACT_DEVSTATUS_E2:                             // Device status E2
+		break;
+		// Device status E2
+		case ACT_DEVSTATUS_E2:
 			r = avclan.message[1];
 			avclan.loadMessage(&CmdDevStatusE2);
 			avclan.message[2] = r;
 			avclan.sendMessage();
-			break;
-		case ACT_DEVSTATUS_E4:                             // Device status E4
+		break;
+		// Device status E4
+		case ACT_DEVSTATUS_E4:
 			r = avclan.message[1];
 			avclan.loadMessage(&CmdDevStatusE4);
 			avclan.message[2] = r;
 			avclan.sendMessage();
-			break;
-		case ACT_PLAY_REQ1:                                // Play request 1
+		break;
+		// Play request 1
+		case ACT_PLAY_REQ1:
 			avclan.sendMessage(&CmdPlayOk1);
-			break;
-		case ACT_PLAY_REQ2:                                // Play request 2
+		break;
+		// Play request 2
+		case ACT_PLAY_REQ2:
 			r = avclan.message[4];
 			avclan.loadMessage(&CmdPlayOk2);
 			avclan.message[4] = r;
 			avclan.sendMessage();
-                        avclan.sendMessage(&CmdPlayOk3);
-			break;
+            avclan.sendMessage(&CmdPlayOk3);
+		break;
 			//r = avclan.sendMessage(&CmdPlayOk2);
 			//if (!r) avclan.sendMessage(&CmdPlayOk3);
-			break;
-		case ACT_AM_PRESS:                                // Press AM button
+			//break;
+		// Press AM button
+		case ACT_AM_PRESS:
 			am=!am;
 			if (am) {
-			bSerial.print("On!");
-			avclan.sendMessage(&CmdInit_0);
-			avclan.sendMessage(&CmdPlayOk1);
+				bSerial.print("On!");
+				avclan.sendMessage(&CmdInit_0);
+				avclan.sendMessage(&CmdPlayOk1);
 			}; 
 			if (!am) {
-			bSerial.print("Off!"); 
-			DISABLE_TIMER1_INT;
-			AZFM_OFF;
-			cd_status = stStop;
-			cd_min = cd_sec = 0;
-			avclan.sendMessage(&CmdStopOk1);
-			r = avclan.message[4];
-			avclan.loadMessage(&CmdStopOk1);
-			avclan.message[4] = r;
-			avclan.sendMessage();
-                        avclan.sendMessage(&CmdPlayOk2);
-                       	};
-			break;
-		case ACT_COORDS:                                // Coordinates calculation
-                        x_coord = avclan.message[4];
+				bSerial.print("Off!");
+				DISABLE_TIMER1_INT;
+				AZFM_OFF;
+				cd_status = stStop;
+				cd_min = cd_sec = 0;
+				avclan.sendMessage(&CmdStopOk1);
+				r = avclan.message[4];
+				avclan.loadMessage(&CmdStopOk1);
+				avclan.message[4] = r;
+				avclan.sendMessage();
+				avclan.sendMessage(&CmdPlayOk2);
+			};
+		break;
+		// Coordinates calculation
+		case ACT_COORDS:
+			x_coord = avclan.message[4];
 			y_coord = avclan.message[5];
 			bSerial.print("Coords X=");
 			bSerial.printHex8(x_coord);
 			bSerial.print("; Y=");
 			bSerial.printHex8(y_coord);
-			break;
-		case ACT_PLAY_IT:                                  // device play
-			if (cd_status != stPlay || (cd_min == 0 && cd_sec == 0)){
+		break;
+		// device play
+		case ACT_PLAY_IT:
+			if (cd_status != stPlay || (cd_min == 0 && cd_sec == 0)) {
 				avclan.loadMessage(&CmdPlayOk4);
 				avclan.message[5] = 1;       // cd disk
 				avclan.message[6] = 1;       // cd track
@@ -216,8 +231,9 @@ void AVCLanDVDch::processAction(AvcActionID ActionID){
 			ENABLE_TIMER1_INT;
 			AZFM_ON;
 			cd_status = stPlay;
-			break;
-		case ACT_STOP_REQ1:                                // Stop request
+		break;
+		// Stop request
+		case ACT_STOP_REQ1:
 		case ACT_STOP_REQ2:
 			DISABLE_TIMER1_INT;
 			AZFM_OFF;
@@ -228,89 +244,111 @@ void AVCLanDVDch::processAction(AvcActionID ActionID){
 			avclan.loadMessage(&CmdStopOk1);
 			avclan.message[4] = r;
 			avclan.sendMessage();
-                        avclan.sendMessage(&CmdPlayOk2);
-			break;
+			avclan.sendMessage(&CmdPlayOk2);
+		break;
 //			avclan.sendMessage(&CmdStopOk2);
 //			avclan.sendMessage(&CmdInit1);
 //			avclan.loadMessage(&CmdStopOk2);
 //			avclan.message[4] = 0x30;
 //			avclan.sendMessage();
-			break;
-		case ACT_LAN_STATUS1:                              // Lan status 1
+			//break;
+		// Lan status 1
+		case ACT_LAN_STATUS1:
 			avclan.sendMessage(&CmdLanStatus1);
 			DISABLE_TIMER1_INT;
-			break;
-		case ACT_LAN_STATUS2:                              // Lan status 2
+		break;
+		// Lan status 2
+		case ACT_LAN_STATUS2:
 			avclan.sendMessage(&CmdLanStatus2);
 			DISABLE_TIMER1_INT;
-			break;
-		case ACT_LAN_STATUS3:                              // Lan status 3
+		break;
+		// Lan status 3
+		case ACT_LAN_STATUS3:
 			avclan.sendMessage(&CmdLanStatus3);
-			break;
-		case ACT_LAN_STATUS4:                              // Lan status 4
+		break;
+		// Lan status 4
+		case ACT_LAN_STATUS4:
 			avclan.sendMessage(&CmdLanStatus4);
-			break;
-		case ACT_LAN_STATUS5:                              // Lan status 5
+		break;
+		// Lan status 5
+		case ACT_LAN_STATUS5:
 			avclan.sendMessage(&CmdLanStatus5);
-			break;
-		case ACT_LAN_CHECK:                                // Lan status 5
+		break;
+		// Lan status 5
+		case ACT_LAN_CHECK:
 			r = avclan.message[3];
 			avclan.loadMessage(&CmdLanCheckOk);
 			avclan.message[4] = r;
 			avclan.sendMessage();
-			break;
-		case ACT_SCAN_ON:                                  // Scan mode on
+		break;
+		// Scan mode on
+		case ACT_SCAN_ON:
 			cd_playmode |= pmScan;
 			sendStatus();
-			break;
-		case ACT_SCAN_OFF:                                 // Scan mode off
+		break;
+		// Scan mode off
+		case ACT_SCAN_OFF:
 			cd_playmode &= ~pmScan;
 			sendStatus();
-			break;
-		case ACT_SCAN_D_ON:                                // Scan directory mode on
+		break;
+		// Scan directory mode on
+		case ACT_SCAN_D_ON:
 			cd_playmode |= pmScanD;
 			sendStatus();
-			break;
-		case ACT_SCAN_D_OFF:                               // Scan directory mode off
+		break;
+		// Scan directory mode off
+		case ACT_SCAN_D_OFF:
 			cd_playmode &= ~pmScanD;
 			sendStatus();
-			break;
-		case ACT_REPEAT_ON:                                // Repeat mode on
+		break;
+		// Repeat mode on
+		case ACT_REPEAT_ON:
 			cd_playmode |= pmRepeat;
 			sendStatus();
-			break;
-		case ACT_REPEAT_OFF:                               // Repeat mode off
+		break;
+		// Repeat mode off
+		case ACT_REPEAT_OFF:
 			cd_playmode &= ~pmRepeat;
 			sendStatus();
-			break;
-		case ACT_REPEAT_D_ON:                              // Repeat directory mode on
+		break;
+		// Repeat directory mode on
+		case ACT_REPEAT_D_ON:
 			cd_playmode |= pmRepeatD;
 			sendStatus();
-			break;
-		case ACT_REPEAT_D_OFF:                             // Repeat directory mode off
+		break;
+		// Repeat directory mode off
+		case ACT_REPEAT_D_OFF:
 			cd_playmode &= ~pmRepeatD;
 			sendStatus();
-			break;
-		case ACT_RANDOM_ON:                                // Random mode on
+		break;
+		// Random mode on
+		case ACT_RANDOM_ON:
 			cd_playmode |= pmRandom;
 			sendStatus();
-			break;
-		case ACT_RANDOM_OFF:                               // Random mode off
+		break;
+		// Random mode off
+		case ACT_RANDOM_OFF:
 			cd_playmode &= ~pmRandom;
 			sendStatus();
-			break;
-		case ACT_RANDOM_D_ON:                              // Random directory mode on
+		break;
+		// Random directory mode on
+		case ACT_RANDOM_D_ON:
 			cd_playmode |= pmRandomD;
 			sendStatus();
-			break;
-		case ACT_RANDOM_D_OFF:                             // Random directory mode off
+		break;
+		// Random directory mode off
+		case ACT_RANDOM_D_OFF:                             
 			cd_playmode &= ~pmRandomD;
 			sendStatus();
-			break;
+		break;
 	}
 };
 
-// process event
+
+
+/************************************************************************/
+/* process event                                                        */
+/************************************************************************/
 void AVCLanDVDch::processEvent(AvcEventID EventID){
 	switch (EventID){
 		case EV_STATUS:
@@ -320,7 +358,11 @@ void AVCLanDVDch::processEvent(AvcEventID EventID){
 	}
 };
 
-// send DVD-changer status to head
+
+
+/************************************************************************/
+/* send DVD-changer status to head                                      */
+/************************************************************************/
 byte AVCLanDVDch::sendStatus(){
 	avclan.loadMessage(&CmdPlayStatus);
 	avclan.message[4] = cd_status;   // cd changer status: 10-play, 80-load, 01-open, 02=err1, 03-wait
@@ -333,11 +375,21 @@ byte AVCLanDVDch::sendStatus(){
 	return avclan.sendMessage();
 }
 
+
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 byte AVCLanDVDch::hexInc(byte data){
 	if ((data & 0x9) == 0x9) return (data + 7);
 	return (data + 1);
 }
 
+
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 byte AVCLanDVDch::hexDec(byte data)
 {
 if ((data & 0xF) == 0) return (data - 7);
@@ -346,7 +398,9 @@ return (data - 1);
 
 
 
-// timer1 overflow
+/************************************************************************/
+/* timer1 overflow                                                      */
+/************************************************************************/ 
 ISR (TIMER1_OVF_vect)
 {
 TCNT1H = TI1_H; // Load counter value hi

@@ -3,7 +3,7 @@
  ”правление AzFM
  */
 
-#define AVCLAN_VERSION "24032016_1030"
+#define AVCLAN_VERSION "20200723"
 
         
 #include <avr/eeprom.h>
@@ -45,7 +45,6 @@ const char PROGMEM str_eeprom[]		={", eeprom="};
 const char PROGMEM str_device[]		={"device="};
 const char PROGMEM str_readonly[]		={"readonly="};
 const char PROGMEM str_tx_overflow[]	={"TX Overflow: "};
-//const char __flash str_AVCLan_Harrier[]	={"AVCLan Harrier 1998 v"};
 const char PROGMEM str_AVCLan_Prius[]	={"AVCLan Prius 20 v"};
 const char PROGMEM str_avclan_version[]	={AVCLAN_VERSION};
 const char PROGMEM str_driver_type[]	={" Driver type: "};
@@ -60,7 +59,7 @@ const char PROGMEM str_avclan_dev_ver[]	={AVCLANDEVICE_VERSION};
 const char PROGMEM str_help_ln1[]		={"P - print config\r\nV - version\r\nS - start command\r\nW - end direct command\r\nQ - end broadcast command\r\n? - help info\r\n"};
 const char PROGMEM str_help_ln2[]		={"H - end of set HU Address, S0000H - auto\r\nT - send test message\r\n"};
 const char PROGMEM str_help_ln3[]		={"h - Output mode. Set Hi level\r\nl - Output mode. Set Low level\r\ni - Out disable, only Input mode\r\nM - readonly mode on/off\r\n"};
-const char PROGMEM str_help_ln4[]		={"D - Manual DVD on\r\nO - Manual DVD off\r\nI - Manual init of DVD\r\no - D11 pin On\r\nv - D11 pin off\r\nC - Set coordinales \"C=123,456,1\""};
+const char PROGMEM str_help_ln4[]		={"D - Manual DVD on\r\nO - Manual DVD off\r\nI - Manual init of DVD\r\nC - Set coordinates \"C=123,456,1\""};
 
 const char PROGMEM str_x[]			={"\r\nx="};
 const char PROGMEM str_y[]			={"\r\ny="};
@@ -78,13 +77,15 @@ LED_OFF;//sbi(LED_PORT, LED_OUT);
 digitalWrite (12, HIGH); //подт€гиваем порт к земле 
 pinMode(11, OUTPUT); // конфигурим D11 порт на вывод - управление реле
 digitalWrite (11, LOW); // выключаем реле*///my comment
-        
+
 bSerial.begin(115200); // конфигурим последовательный порт на 115200
 avclan.begin();
+
 avclanDevice.begin();
 EERPOM_read_config();
 bSerial.println();
-bSerial.println_p(str_AVCLan_Prius);
+bSerial.print_p(str_AVCLan_Prius);
+bSerial.println_p(str_avclan_version);
 }
 
 
@@ -94,10 +95,9 @@ extern bool touched;
 
 void AVCLan_Task()
 {
-
 if (INPUT_IS_SET)
 	{
-	LED_ON;
+	//LED_ON;
 	byte res = avclan.readMessage();
 
 	// проверка на задний ход
@@ -131,7 +131,7 @@ if (INPUT_IS_SET)
 		bSerial.println("L:ON Cam:ON");
 		};*///my comment
 	
-	LED_OFF;
+	//LED_OFF;
 	if (!res)
 		{
 		if (!avclan.readonly) avclanDevice.getActionID();
@@ -152,11 +152,13 @@ if (avclan.event != EV_NONE)
 
 if (bSerial.rxEnabled())
 	{
+	LED_ON;
 	uint8_t readkey = bSerial.rxRead();
 
 	switch (readkey)
 		{
-		case 'P':                                  // print config
+		// print config
+		case 'P':
 			bSerial.println();
 			bSerial.print_p(str_head);
 			bSerial.printHex8(avclan.headAddress >> 8);
@@ -177,37 +179,43 @@ if (bSerial.rxEnabled())
 			bSerial.printHex8(bSerial.txOverflow);
 			bSerial.println();
 		break;
-		case 'T':  //send test message
+		//send Broadcast test message
+		case 'T':
 			bSerial.println();
 			bSerial.println("Test_message  ");
 			sendMessBROADCAST();
 			bSerial.println();
 		break;
-		case 'L':  //send test message
+		//send Direct test message
+		case 'L': 
 			bSerial.println();
 			bSerial.println("Test_message  ");
 			sendMessDIRECT();
 			bSerial.println();
 		break;
-		case 'D':  //Manual DVD on
+		//Manual DVD on
+		case 'D':
 			bSerial.println();
 			bSerial.println("DVD On");
 			avclan.sendMessage(&CmdPlayOk1_0);
 			bSerial.println();
-		break;                   
-		case 'O':  //Manual DVD off
+		break;
+		//Manual DVD off
+		case 'O':
 			bSerial.println();
 			bSerial.println("DVD Off");
 			avclan.sendMessage(&CmdStopOk2_0);
 			bSerial.println();
-			break;                
-		case 'I':  //Manual init of DVD changer
+		break;                
+		//Manual init of DVD changer
+		case 'I':
 			bSerial.println();
 			bSerial.println("Init");
 			avclan.sendMessage(&CmdInit_01);
 			bSerial.println();			
-		break;                
-		case 'A':  //Test AM on/off
+		break;
+		//Test AM on/off
+		case 'A':
 			bSerial.println();
 			bSerial.println("AM press");
 			avclan.sendMessage(&CmdAM_01);
@@ -227,25 +235,30 @@ if (bSerial.rxEnabled())
 			bSerial.printHex8(digitalRead(11));
 			bSerial.println();
 		break;   *///my comment
-		case 'M':  //readonly mode on/off
+		//readonly mode on/off
+		case 'M':
 			avclan.readonly ^= (1 << 0);
 			eeprom_write_byte(&ee_data.readonly, avclan.readonly);
 		break;
-		case 'h':  // set hi level 
+		// set AVC out hi level
+		case 'h':
 			bSerial.println("H set");
 			AVC_OUT_EN;
 			OUTPUT_SET_1;
 		break;
-		case 'l':  // set low level
+		// set AVC Out low level
+		case 'l':
 			bSerial.println("L set");
 			AVC_OUT_EN;
 			OUTPUT_SET_0;
 		break;
-		case 'i': // output disable. Input mode on
+		// output disable. Input mode on
+		case 'i':
 			bSerial.println("Out dis");
 			AVC_OUT_DIS;
 		break;
-		case 'V':                      // version
+		// version
+		case 'V':
 			bSerial.print_p  (str_AVCLan_Prius);
 			bSerial.println_p(str_avclan_version);
 			bSerial.print_p  (str_driver_type);
@@ -257,14 +270,16 @@ if (bSerial.rxEnabled())
 			bSerial.print_p  (str_avclan_dev_name);
 			bSerial.print_p  (str_ver);
 			bSerial.println_p(str_avclan_dev_ver);
-		break;		
-		case 'S':	                   // start command
+		break;
+		// start command
+		case 'S':
 			readSeq = 1;       
 			s_len=0;
 			s_dig=0;
 			s_c[0] = s_c[1] = 0;
 		break;
-		case 'W':                      // end of direct command
+		// end of direct command
+		case 'W':
 			readSeq=0;                     
 			avclan.dataSize      = s_len;
 			avclan.broadcast     = AVC_MSG_DIRECT;
@@ -273,7 +288,8 @@ if (bSerial.rxEnabled())
 			for (i=0; i<s_len; i++) avclan.message[i]=data_tmp[i];
 			avclan.sendMessage();
 		break;
-		case 'Q' :                     // end of broadcast command
+		// end of broadcast command
+		case 'Q' :
 			readSeq=0;                     
 			avclan.dataSize      = s_len;
 			avclan.broadcast     = AVC_MSG_BROADCAST;
@@ -281,50 +297,55 @@ if (bSerial.rxEnabled())
 			avclan.slaveAddress  = 0x01FF;
 			for (i=0; i<s_len; i++) avclan.message[i]=data_tmp[i];
 			avclan.sendMessage();
-			break;
-		case 'H' :                     // end of set Head Unid ID 
+		break;
+		// end of set Head Unid ID
+		case 'H' :
 			readSeq=0;
 			avclan.headAddress = (data_tmp[0] << 8) + data_tmp[1];
 			eeprom_write_byte(&ee_data.e_master1, data_tmp[0]);
 			eeprom_write_byte(&ee_data.e_master2, data_tmp[1]);
 		break;
-		case 'C' :                     // Manual set Coorninates
+		// Manual set Coordinates
+		case 'C' :
 			{
-			uint8_t X=0;
-			for (char i=0; i<3; i++)
+			uint16_t X=0;
+			for (char i=0; i<5; i++)
 				{
 				
 				while(!bSerial.rxEnabled());
 				char c=bSerial.rxRead();
-				if ((X>='0')&&(X<='9')) X=(X*10)+(X&0x0F);
-				if (c==',') {adc_x=X; break;}
+				if ((c>='0')&&(c<='9')) X=(X*10)+(c&0x0F);
+				if (c==',') {break;}
 				}
-			uint8_t Y=0;
-			for (char i=0; i<3; i++)
+			uint16_t Y=0;
+			for (char i=0; i<5; i++)
 				{
 				while(!bSerial.rxEnabled());
 				char c=bSerial.rxRead();
-				if ((Y>='0')&&(Y<='9')) Y=(Y*10)+(Y&0x0F);
-				if (Y==',') {adc_y=Y; break;}
+				if ((c>='0')&&(c<='9')) Y=(Y*10)+(c&0x0F);
+				if (c==',') {break;}
 				}
 			while(!bSerial.rxEnabled());
 			if (bSerial.rxRead()=='1') touched=true; else touched=false;
+			adc_x=X;
+			adc_y=Y; 
 			
-			bSerial.print_p  (str_x);
-			bSerial.printDec (X);
-			bSerial.println_p(str_y);
-			bSerial.printDec (Y);
-			bSerial.print_p  (str_touch);
-			bSerial.printDec (touched);
+			bSerial.print_p (str_x);
+			bSerial.printDec(adc_x);
+			bSerial.print_p (str_y);
+			bSerial.printDec(adc_y);
+			bSerial.print_p (str_touch);
+			bSerial.printDec(touched);
 			}
 		break;
+		// Help
 		case '?':
-			bSerial.println_p(str_help_ln1);
-			_delay_ms(500);
-			bSerial.println_p(str_help_ln2);
-			_delay_ms(500);
-			bSerial.println_p(str_help_ln3);
-			_delay_ms(500);
+			bSerial.print_p(str_help_ln1);
+			_delay_ms(100);
+			bSerial.print_p(str_help_ln2);
+			_delay_ms(100);
+			bSerial.print_p(str_help_ln3);
+			_delay_ms(100);
 			bSerial.println_p(str_help_ln4);
 		break;
 		default :
@@ -349,6 +370,7 @@ if (bSerial.rxEnabled())
 					}
 				}
 		}
+		LED_OFF;
 	}
 }
 

@@ -8,8 +8,8 @@
 #define AVCLanCDch_h
 
 #include <avr/pgmspace.h>
-#include "AVCLanDrv.h"
-#include "WProgram.h"
+#include "AVCLanDrv/AVCLanDrv.h"
+//#include "WProgram.h"
 
 // timer1 overflow every 1 sec 
 #define TI1_H	(((word)-(F_CPU / 1024)) >> 8)
