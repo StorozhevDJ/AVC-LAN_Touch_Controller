@@ -14,6 +14,7 @@
 //#include "AVC-LAN/AVCLanNavi/AVCLanNavi.h"
 //#include "AVC-LAN/AVCLanCDch/AVCLanCDch.h"
 #include "BuffSerial/BuffSerial.h"
+#include "../USBSerialCDC/usbTerminal.h"
 #include "AVCLanDrv/config.h"
 #include "Navi_DVD_AVin.h"
 
@@ -57,14 +58,19 @@ const char PROGMEM str_avclan_dev_name[]={AVCLANDEVICE_NAME};
 const char PROGMEM str_ver[]			={". v"};
 const char PROGMEM str_avclan_dev_ver[]	={AVCLANDEVICE_VERSION};
 const char PROGMEM str_help_ln1[]		={"P - print config\r\nV - version\r\nS - start command\r\nW - end direct command\r\nQ - end broadcast command\r\n? - help info\r\n"};
-const char PROGMEM str_help_ln2[]		={"H - end of set HU Address, S0000H - auto\r\nT - send test message\r\n"};
+const char PROGMEM str_help_ln2[]		={"H - end of set HU Address, S0000H - auto\r\nT - send test message\r\nd - on/off debug log\r\n"};
 const char PROGMEM str_help_ln3[]		={"h - Output mode. Set Hi level\r\nl - Output mode. Set Low level\r\ni - Out disable, only Input mode\r\nM - readonly mode on/off\r\n"};
-const char PROGMEM str_help_ln4[]		={"D - Manual DVD on\r\nO - Manual DVD off\r\nI - Manual init of DVD\r\nC - Set coordinates \"C=123,456,1\""};
+const char PROGMEM str_help_ln4[]		={"D - Manual DVD on\r\nO - Manual DVD off\r\nI - Manual init of DVD\r\nC - Set coordinates \"C=123,45,1\""};
 
-const char PROGMEM str_x[]			={"\r\nx="};
-const char PROGMEM str_y[]			={"\r\ny="};
-const char PROGMEM str_touch[]		={"\r\nTouch="};
+const char PROGMEM str_x[]				={"\r\nx="};
+const char PROGMEM str_y[]				={"\r\ny="};
+const char PROGMEM str_touch[]			={"\r\nTouch="};
 
+const char PROGMEM dbgOn[]				={"Debug On"};
+const char PROGMEM dbgOff[]				={"Debug Off"};
+
+const char PROGMEM testmsg[]			={"Test message  "};
+//const char PROGMEM dbgOff[]				={"Debug Off"};
 
 
 void AVCLan_Setup()
@@ -147,13 +153,19 @@ if (avclan.event != EV_NONE)
 	avclanDevice.processEvent((AvcEventID)avclan.event);
 	avclan.event = EV_NONE;
 	}
+}
 
 
-
+void terminalTask() {
+int16_t readUSB = readUsbTerminalByte();
+if (readUSB >= 0) {
+	bSerial.addByte(readUSB);
+}
 if (bSerial.rxEnabled())
 	{
 	LED_ON;
-	uint8_t readkey = bSerial.rxRead();
+	int16_t readUSB = -1; //readUsbTerminalByteEcho();
+	uint8_t readkey = (readUSB >= 0) ? readUSB : bSerial.rxRead();
 
 	switch (readkey)
 		{
@@ -182,14 +194,14 @@ if (bSerial.rxEnabled())
 		//send Broadcast test message
 		case 'T':
 			bSerial.println();
-			bSerial.println("Test_message  ");
+			bSerial.println(testmsg);
 			sendMessBROADCAST();
 			bSerial.println();
 		break;
 		//send Direct test message
 		case 'L': 
 			bSerial.println();
-			bSerial.println("Test_message  ");
+			bSerial.println(testmsg);
 			sendMessDIRECT();
 			bSerial.println();
 		break;
@@ -311,21 +323,35 @@ if (bSerial.rxEnabled())
 			uint16_t X=0;
 			for (char i=0; i<5; i++)
 				{
-				
-				while(!bSerial.rxEnabled());
+				while(!bSerial.rxEnabled()) {
+					int16_t readUSB = readUsbTerminalByte();
+					if (readUSB >= 0) {
+						bSerial.addByte(readUSB);
+					}
+				};
 				char c=bSerial.rxRead();
 				if ((c>='0')&&(c<='9')) X=(X*10)+(c&0x0F);
 				if (c==',') {break;}
 				}
 			uint16_t Y=0;
-			for (char i=0; i<5; i++)
+			for (char i=0; i<4; i++)
 				{
-				while(!bSerial.rxEnabled());
+				while(!bSerial.rxEnabled()) {
+					int16_t readUSB = readUsbTerminalByte();
+					if (readUSB >= 0) {
+						bSerial.addByte(readUSB);
+					}
+				};
 				char c=bSerial.rxRead();
 				if ((c>='0')&&(c<='9')) Y=(Y*10)+(c&0x0F);
 				if (c==',') {break;}
 				}
-			while(!bSerial.rxEnabled());
+			while(!bSerial.rxEnabled()) {
+				int16_t readUSB = readUsbTerminalByte();
+				if (readUSB >= 0) {
+					bSerial.addByte(readUSB);
+				}
+			};
 			if (bSerial.rxRead()=='1') touched=true; else touched=false;
 			adc_x=X;
 			adc_y=Y; 
@@ -336,6 +362,13 @@ if (bSerial.rxEnabled())
 			bSerial.printDec(adc_y);
 			bSerial.print_p (str_touch);
 			bSerial.printDec(touched);
+			}
+		break;
+		// Debug log
+		case 'd': {
+			bool debug = !avclan.getDebugLog();
+			avclan.setDebugLog(debug);
+			bSerial.println_p(debug ? dbgOn : dbgOff);
 			}
 		break;
 		// Help

@@ -106,6 +106,9 @@ class AVCLanDrv{
 		byte	event;
 		byte	actionID;
 		bool	readonly;
+		
+		bool	debugLog;
+		
 		void	begin ();
 		byte	readMessage (void);
 		byte	sendMessage (void);
@@ -115,6 +118,9 @@ class AVCLanDrv{
 		byte	getActionID (AvcInMessageTable messageTable[], byte mtSize);
 		byte	getActionID (AvcInMaskedMessageTable messageTable[], byte mtSize);
 		void	loadMessage (const AvcOutMessage*);
+		
+		void	setDebugLog(bool state);
+		bool	getDebugLog();
 	private:
 		bool	_parityBit;
 		word	readBits (byte nbBits);
@@ -127,6 +133,7 @@ class AVCLanDrv{
 		void	send12BitWord (word data);
 		bool	readAcknowledge (void);
 		bool	handleAcknowledge (void);
+
 };
 
 extern AVCLanDrv avclan;

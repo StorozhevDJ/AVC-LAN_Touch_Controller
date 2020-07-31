@@ -64,6 +64,7 @@ extern "C" {
 
 void AVCLan_Setup();
 void AVCLan_Task();
+void terminalTask();
 
 
 // Чтение конфигурации из EEPROM

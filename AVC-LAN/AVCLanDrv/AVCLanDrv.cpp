@@ -4,6 +4,50 @@
   Created by Kochetkov Aleksey, 04.08.2010
   Edit by Storozhev Denis 21/07/2020
   Version 0.3.1
+  
+  ----------------------------------------------------------------------------------------------------
+  AVC LAN Theory
+  The AVC bus is an implementation of the IEBus which is a differential line, floating on logical
+  level '1' and driving on logical '0'. Floating level shall be below 20 mV whereas driving level
+  shall be above 120 mV.
+  The diagram below represents how things work from a logical perspective on the bus.
+  A rising edge indicates a new bit. The duration of the high state tells whether it is a start
+  bit (~165 us), a bit '0' (~30 us) or a bit '1' (~20 us). A normal bit length is close to 40 us.
+  
+                    |<---- Bit '0' ---->|<---- Bit '1' ---->|
+  Physical '1'      ,---------------,   ,---------,         ,---------
+                    ^               |   ^         |         ^
+  Physical '0' -----'               '---'         '---------'--------- Idle low
+                    |---- 32 us ----| 7 |- 20 us -|- 19 us -|
+					
+  A bit '1' is typically 20 us high followed by 19 us low.
+  A bit '0' is typically 32 us high followed by 7 us low. A bit '0' is dominant i.e. it takes
+  precedence over a '1' by extending the pulse. This is why lower addresses win on arbitration.
+  A start bit is typically 165 us high followed by 30 us low.
+  AVC LAN Frame Format
+  Bits Description
+  1    Start bit
+  1    MSG_NORMAL
+  12   Master address
+  1    Parity
+  12   Slave address
+  1    Parity
+  1    * Acknowledge * (read below)
+  4    Control
+  1    Parity
+  1    * Acknowledge * (read below)
+  8    Payload length (n)
+  1    Parity
+  1    * Acknowledge * (read below)
+  8    Data
+  1    Parity
+  1    * Acknowledge * (read below)
+  repeat 'n' times
+  In point-to-point communication, sender issues an ack bit with value '1' (20 us). Receiver
+  upon acking will extend the bit until it looks like a '0' (32 us) on the bus. In broadcast
+  mode, receiver disregards the bit.
+  An acknowledge bit of value '0' means OK, '1' means no ack.
+  --------------------------------------------------------------------------------------------------
 */
 
 #include "AVCLanDrv.h"
@@ -30,7 +74,7 @@ void AVCLanDrv::begin (){
 	cbi(ADCSRB, ACME);	// Analog Comparator Multiplexer Enable - NO
 	cbi(ACSR, ACIS1);	// Analog Comparator Interrupt Mode Select
 	cbi(ACSR, ACIS0);  // Comparator Interrupt on Output Toggle
-	cbi(ACSR, ACD); 	// Analog Comparator Disbale - NO
+	cbi(ACSR, ACD); 	// Analog Comparator Disable - NO
 #else 
 #ifdef AVCLAN_ST485
 	sbi(DATAOUT_DDR,  DATAOUT);
@@ -46,19 +90,13 @@ void AVCLanDrv::begin (){
 #endif
 
 // timer2 setup, prescaler factor - 8
-#if defined(__AVR_ATmega8__)
-//	ASSR=0x00;
-	TCCR2=0x02;
-//	TCNT2=0x00;
-//	OCR2=0x00;
-#else   // ATMega168
 //	ASSR=0x00;
 //	TCCR2A=0x00;
 	TCCR0B=0x02;
 //	TCNT2=0x00;
 //	OCR2A=0x00;
 //	OCR2B=0x00;
-#endif
+
 	headAddress   = 0x0000;
 	deviceAddress = 0x0000;
 	BoardDeviceAddress = 0x0000;
@@ -226,6 +264,7 @@ byte AVCLanDrv::_readMessage (){
 /************************************************************************/ 
 byte AVCLanDrv::readMessage (){
 	byte res = avclan._readMessage();
+	if (!debugLog) return res;
 	if (!res){
 		avclan.printMessage(true);
 	}else{
@@ -576,10 +615,12 @@ void AVCLanDrv::printMessage(bool incoming){
 	bSerial.printHex8(slaveAddress);
 	bSerial.print(" ");
 	bSerial.printHex8(dataSize);
-
+	bSerial.print(" ");
+	
 	for (byte i = 0; i < dataSize; i++){
 		bSerial.printHex8(message[i]);
 	}
+	bSerial.println();
 }
 
 
@@ -678,6 +719,16 @@ void AVCLanDrv::loadMessage(const AvcOutMessage *msg){
 	for (byte i = 0; i < dataSize; i++ ){
 		message[i] = pgm_read_byte_near( &msg->data[i] );
 	}
-};
+}
+	
+	
+void AVCLanDrv::setDebugLog(bool state) {
+	debugLog = state;
+}
+
+bool AVCLanDrv::getDebugLog() {
+	return debugLog;
+}
+
 
 AVCLanDrv avclan;

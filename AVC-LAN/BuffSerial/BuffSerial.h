@@ -47,7 +47,8 @@ class BuffSerial{
 		void		printHex8(uint8_t);
 		void		printDec(uint8_t);
 		bool		rxEnabled(void);
-		uint8_t		rxRead(void);	
+		uint8_t		rxRead(void);
+		void		addByte(uint8_t data);
 };
 
 extern BuffSerial bSerial;

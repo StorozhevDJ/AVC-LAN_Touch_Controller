@@ -223,7 +223,7 @@ void AVCLanDVDch::processAction(AvcActionID ActionID){
 				avclan.loadMessage(&CmdPlayOk4);
 				avclan.message[5] = 1;       // cd disk
 				avclan.message[6] = 1;       // cd track
-				avclan.message[7] = cd_min;  // play tme min
+				avclan.message[7] = cd_min;  // play time min
 				avclan.message[8] = cd_sec;  // play time sec
 				r = avclan.sendMessage();
 			}

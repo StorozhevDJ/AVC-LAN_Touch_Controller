@@ -8,7 +8,7 @@
 #include <avr/interrupt.h>
 
 #include "BuffSerial.h"
-
+#include "../USBSerialCDC/usbTerminal.h"
 
 
 /************************************************************************/
@@ -54,6 +54,12 @@ SIGNAL(USART1_TX_vect)
 
 
 
+void BuffSerial::addByte(uint8_t data) {
+	bSerial.rxBuffer[bSerial.rxEnd] = data;
+	if (bSerial.rxEnd < RX_BUFF_SIZE) bSerial.rxEnd++;
+}
+
+
 /************************************************************************/
 /* Send byte to serial (UART) or buffer if busy                         */
 /************************************************************************/ 
@@ -61,6 +67,7 @@ void BuffSerial::sendByte(uint8_t data){
 	if (txFull){
 		txOverflow++;
 	}else{
+		/* Отключил для проверки мешает ли передача UART приему по AVC-Lan или нет (пропуски пакетов из-за торомозов во время передачи)
 		//uint8_t oldSREG = SREG;
 		cli();	//disable interrupt (global)
 		if (txEnd != txBegin || (UCSR1A & _BV(UDRE1)) == 0){	//Check if buffer not empty or if USART Data Register Empty
@@ -71,8 +78,9 @@ void BuffSerial::sendByte(uint8_t data){
 		}else{
 			UDR1 = data;	//Start transmit first byte from buffer
 		}
-		sei();	//enable global interrupt
+		sei();	//enable global interrupt*/
 		//SREG = oldSREG;//тут происходил сброс
+		sendUsbTermianlByte(data);
 	}
 }
 
@@ -179,11 +187,14 @@ bool BuffSerial::rxEnabled(void){
 /* Read byte from serial buffer                                         */
 /************************************************************************/
 uint8_t BuffSerial::rxRead(void){
+	// USART interface
 	cbi(UCSR1B, RXCIE1);                         // disable RX complete interrupt
 	uint8_t readkey = rxBuffer[rxBegin];         // read begin of received Buffer
 	rxBegin++;
 	if (rxBegin == rxEnd) rxBegin = rxEnd = 0;   // if Buffer is empty reset Buffer
 	sbi(UCSR1B, RXCIE1);                         // enable RX complete interrupt
+	// USB interface
+	
 	return readkey;
 }
 

@@ -10,6 +10,8 @@
 #include "restouch.h"
 #include "buffers.h"
 
+#include "../USBSerialCDC/usbTerminal.h"
+
 #include "../AVC-LAN/AVCLanDrv/config.h"
 #include "../AVC-LAN/Navi_DVD_AVin.h"
 
@@ -17,11 +19,8 @@
 #define CDCBUFLENGTH 16
 #define TCNT3SET 256-128  //10 мсек
 
-#define WF_PORT PORTD
-#define WF_PIN PIND
-#define WF_DDR DDRD
-#define WF_MASK 0x02
 
+extern USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface;
 
 
 bool usemouse;
@@ -46,38 +45,12 @@ USB_ClassInfo_HID_Device_t Digitizer_HID_Interface =
 
 
 
-USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface =
-{
-	.Config =
-	{
-		.ControlInterfaceNumber         = 0,
-		.DataINEndpoint                 =
-		{
-			.Address                = CDC_TX_EPADDR,
-			.Size                   = CDC_TXRX_EPSIZE,
-			.Banks                  = 1,
-		},
-		.DataOUTEndpoint                =
-		{
-			.Address                = CDC_RX_EPADDR,
-			.Size                   = CDC_TXRX_EPSIZE,
-			.Banks                  = 1,
-		},
-		.NotificationEndpoint           =
-		{
-			.Address                = CDC_NOTIFICATION_EPADDR,
-			.Size                   = CDC_NOTIFICATION_EPSIZE,
-			.Banks                  = 1,
-		},
-	},
-};
+
 
 
 
 int main(void)
 {
-	int16_t cdcdata;
-	
 	SetupHardware();
 	AVCLan_Setup();
 	
@@ -86,20 +59,16 @@ int main(void)
     while(1)
     {
 		AVCLan_Task();
+		terminalTask();
 		
 		//задачи сенсорного экрана	
-		rtTouchTask();
+		//rtTouchTask();
 
-		//получение байтов по виртуалному последовательному порту и передача их диспетчеру комманд
-        //cdcdata=CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
-		//if (cdcdata>=0) {
-			//cdcdata=cmdByte(cdcdata);
-			//если диспетчер вернул положительное число, отправляем его в виртуальный последовательный порт
-			//if (cdcdata>=0) CDC_Device_SendByte(&VirtualSerial_CDC_Interface, cdcdata);
-		//}
+		//sendUsbTermianlByte(readUsbTerminalByte());
+		
 
 		//задачи USB
-		CDC_Device_USBTask(&VirtualSerial_CDC_Interface);
+		usbTerminalTask();
 		HID_Device_USBTask(&Digitizer_HID_Interface);
 		USB_USBTask();		
     }
@@ -125,9 +94,6 @@ void SetupHardware()
 	
 	cmdInit(); //подготовка диспетчера комманд
 	
-	/* windows mode external flag input*/
-	WF_DDR|=WF_MASK;
-	WF_PORT|=WF_MASK;
 	
 	/* Timer 0 */
 	TCCR3A = 0;

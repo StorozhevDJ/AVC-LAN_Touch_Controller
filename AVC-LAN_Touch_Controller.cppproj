@@ -285,6 +285,12 @@
     <Compile Include="TouchUSB\TouchController.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="USBSerialCDC\usbTerminal.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="USBSerialCDC\usbTerminal.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AVC-LAN" />
@@ -292,6 +298,7 @@
     <Folder Include="AVC-LAN\AVCLanDVDch" />
     <Folder Include="AVC-LAN\BuffSerial" />
     <Folder Include="AVC-LAN\AVCLanTVTunerAVin" />
+    <Folder Include="USBSerialCDC" />
     <Folder Include="TouchUSB" />
     <Folder Include="TouchUSB\LUFA" />
     <Folder Include="TouchUSB\LUFA\Common" />
