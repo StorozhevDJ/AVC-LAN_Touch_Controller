@@ -49,7 +49,7 @@ const AvcInMaskedMessageTable  mtMaskedMain[] PROGMEM = {
 	{ACT_DEVSTATUS_EU, 0x04, {0x00, 0x34, 0x45, 0xE4}, _BV(1)},//*
 	{ACT_LAN_CHECK,    0x04, {0x12, 0x01, 0x20, 0}, _BV(3)}, //*
 	{ACT_PLAY_REQ2,    0x06, {0x00, 0x12, 0x45, 0x42, 0, 0x01}, _BV(4)},
-	{ACT_COORDS,       0x08, {0x00, 0x21, 0x24, 0x78, 0, 0, 0, 0}, 0xF0}, // координаты нажатия, маскированы 4 байта
+	{ACT_SCREEN,       0x08, {0x00, 0x21, 0x24, 0x78, 0, 0, 0, 0}, 0xF0}, // координаты нажатия, маскированы 4 байта
 	{ACT_STOP_REQ1,    0x05, {0x00, 0x12, 0x43, 0x43, 0}, _BV(4)},
 	{ACT_STOP_REQ2,    0x06, {0x00, 0x12, 0x43, 0x43, 0, 0x00}, _BV(4)},
 };
@@ -65,9 +65,9 @@ const AvcInMessageTable  mtSearchHead[] PROGMEM = {
 };
 const byte mtSearchHeadSize = sizeof(mtSearchHead) / sizeof(AvcInMessageTable);
 
-const AvcOutMessage CmdInit_0        PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x01, 0x11, 0x13, 0x24, 0x45}};
 const AvcOutMessage CmdReset         PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x00, 0x00, 0x00, 0x00, 0x00}}; // reset AVCLan. This causes HU to send ACT_REGISTER
-const AvcOutMessage CmdRegister      PROGMEM =  {AVC_MSG_DIRECT,     0x06, {0x00, 0x01, 0x12, 0x10, 0x24, 0x45}}; // register CD-changer
+const AvcOutMessage CmdRegister      PROGMEM =  {AVC_MSG_DIRECT,     0x07, {0x00, 0x01, 0x12, 0x10, 0x24, 0x45, 0x21}}; // register DVD-changer (CmdRegister регистрирует логические устойства в голове)
+const AvcOutMessage CmdInit_0        PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x01, 0x11, 0x13, 0x24, 0x45}};//CmdInit сообщает параметры (в чейджере например это емкость чейджера, количество загруженных дисков и т.д.)
 const AvcOutMessage CmdInit3         PROGMEM =  {AVC_MSG_BROADCAST,  0x14, {0x45, 0x31, 0xF3, 0x00, 0x02, 0x04, 0x06, 0x08, 0x09, 0x0A, 0x0C, 0x15, 0x17, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* init command 3
 const AvcOutMessage CmdDevStatusE0   PROGMEM =  {AVC_MSG_DIRECT,     0x10, {0x00, 0x45, 0, 0xF0, 0x03, 0x10, 0xA0, 0x01, 0x02, 0xF0, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* Device status E0
 const AvcOutMessage CmdDevStatusE2   PROGMEM =  {AVC_MSG_DIRECT,     0x10, {0x00, 0x45, 0, 0xF2, 0x03, 0x10, 0xA0, 0x01, 0x02, 0xF0, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* Device status E0
@@ -190,12 +190,12 @@ void AVCLanDVDch::processAction(AvcActionID ActionID){
 		case ACT_AM_PRESS:
 			am=!am;
 			if (am) {
-				bSerial.print("On!");
+				bSerial.print("AM_On!");
 				avclan.sendMessage(&CmdInit_0);
 				avclan.sendMessage(&CmdPlayOk1);
 			}; 
 			if (!am) {
-				bSerial.print("Off!");
+				bSerial.print("AM_Off!");
 				DISABLE_TIMER1_INT;
 				AZFM_OFF;
 				cd_status = stStop;
@@ -209,7 +209,7 @@ void AVCLanDVDch::processAction(AvcActionID ActionID){
 			};
 		break;
 		// Coordinates calculation
-		case ACT_COORDS:
+		case ACT_SCREEN:
 			x_coord = avclan.message[4];
 			y_coord = avclan.message[5];
 			bSerial.print("Coords X=");

@@ -64,7 +64,7 @@ typedef enum{
 	ACT_RANDOM_D_ON,
 	ACT_RANDOM_D_OFF,
 	ACT_AM_PRESS,
-	ACT_COORDS,
+	ACT_SCREEN,
 } AvcActionID;
 
 typedef enum{

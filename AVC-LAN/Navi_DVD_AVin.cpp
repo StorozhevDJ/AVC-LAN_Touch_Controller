@@ -10,7 +10,8 @@
 #include <util/delay.h>
 
 #include "AVCLanDrv/AVCLanDrv.h"
-#include "AVCLanDVDch/AVCLanDVDch.h"
+#include "AVCLanTVTunerAVin/AVCLanTVTunerAVin.h"
+//#include "AVCLanDVDch/AVCLanDVDch.h"
 //#include "AVC-LAN/AVCLanNavi/AVCLanNavi.h"
 //#include "AVC-LAN/AVCLanCDch/AVCLanCDch.h"
 #include "BuffSerial/BuffSerial.h"
@@ -76,13 +77,8 @@ const char PROGMEM testmsg[]			={"Test message  "};
 void AVCLan_Setup()
 {
 // setup led
-sbi(LED_DDR,  LED_OUT);
+sbi(LED_AVCLAN_DDR,  LED_AVCLAN_OUT);
 LED_OFF;//sbi(LED_PORT, LED_OUT);
-        
-/*pinMode(12, INPUT); // конфигурим D12 порт на ввод дл€ лампы заднего хода
-digitalWrite (12, HIGH); //подт€гиваем порт к земле 
-pinMode(11, OUTPUT); // конфигурим D11 порт на вывод - управление реле
-digitalWrite (11, LOW); // выключаем реле*///my comment
 
 bSerial.begin(115200); // конфигурим последовательный порт на 115200
 avclan.begin();
@@ -193,10 +189,8 @@ if (bSerial.rxEnabled())
 		break;
 		//send Broadcast test message
 		case 'T':
-			bSerial.println();
 			bSerial.println(testmsg);
 			sendMessBROADCAST();
-			bSerial.println();
 		break;
 		//send Direct test message
 		case 'L': 
@@ -207,31 +201,23 @@ if (bSerial.rxEnabled())
 		break;
 		//Manual DVD on
 		case 'D':
-			bSerial.println();
 			bSerial.println("DVD On");
 			avclan.sendMessage(&CmdPlayOk1_0);
-			bSerial.println();
 		break;
 		//Manual DVD off
 		case 'O':
-			bSerial.println();
 			bSerial.println("DVD Off");
 			avclan.sendMessage(&CmdStopOk2_0);
-			bSerial.println();
 		break;                
 		//Manual init of DVD changer
 		case 'I':
-			bSerial.println();
 			bSerial.println("Init");
 			avclan.sendMessage(&CmdInit_01);
-			bSerial.println();			
 		break;
 		//Test AM on/off
 		case 'A':
-			bSerial.println();
 			bSerial.println("AM press");
 			avclan.sendMessage(&CmdAM_01);
-			bSerial.println();			
 		break;           
 		/*case 'o':  //D11 on
 			bSerial.println();

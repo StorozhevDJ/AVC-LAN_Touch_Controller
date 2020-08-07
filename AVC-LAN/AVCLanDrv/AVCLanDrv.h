@@ -75,7 +75,7 @@ typedef struct
 {
 	byte	actionID;           // Action id
 	byte	dataSize;           // message size (bytes)
-	byte	data[20];           // message
+	byte	data[32];           // message
 	word	mask;		// mask, set bit = 1 in not checked position (1<<5 or _BV(5) - datap[5] not checked)
 } AvcInMaskedMessageTable;
 

@@ -1,7 +1,7 @@
 /*
   AVCLanDrv.h - AVCLan TV tuner library for 'duino / Wiring
   Created by Storozhev Denis, 2020/07/24
-  Version 0.2.3
+  Version 0.0.1
 */
 
 #ifndef AVCLANTVTUNERAVIN_H
@@ -18,7 +18,7 @@
 #define ENABLE_TIMER1_INT  (sbi(TIMSK1, TOIE1));
 #define DISABLE_TIMER1_INT (cbi(TIMSK1, TOIE1));
 
-#define AVCLANDEVICE_NAME    " TV tuner + AV in"
+#define AVCLANDEVICE_NAME    " TV tuner with AV-in"
 #define AVCLANDEVICE_VERSION "0.1.0"
 
 //extern const AvcOutMessage CmdReset; // reset AVCLan. This causes HU to send ACT_REGISTER
@@ -57,7 +57,8 @@ typedef enum{
 	ACT_RANDOM_D_ON,
 	ACT_RANDOM_D_OFF,
 	ACT_AM_PRESS,
-	ACT_COORDS,
+	ACT_SCREEN,
+	ACT_GPS_DATA,
 } AvcActionID;
 
 typedef enum{
@@ -82,22 +83,17 @@ typedef enum{
 
 class AVCLanTVTunerAVin{
 	public:
-		byte		cd_min;                      // minutes play
-		byte		cd_sec;                      // seconds play
-		cdStatus	cd_status;                   // cd changer status
-		byte		cd_playmode;                 // play mode (scan, random etc..)
-		void		begin ();                    // initialisation, obligatory method
-		void		getActionID();               // get action id by recieved message, obligatory method
+		void		begin ();                    // initialization, obligatory method
+		void		getActionID();               // get action id by received message, obligatory method
 		void		processAction(AvcActionID);  // process action, obligatory method
 		void		processEvent(AvcEventID);    // process event, obligatory method
-		byte		sendStatus();                // send CD-changer status to head
+		byte		sendStatus();                // send status to head
 		byte		hexInc(byte data);
 		byte		hexDec(byte data);
-		bool 		am;
-		byte		x_coord;			// X координата 00.FF
-		byte		y_coord;			// Y координата 00.FF
+		byte		x_coord;			// X coordinate 00...FF
+		byte		y_coord;			// Y coordinate 00...FF
 
 };
 #endif	//AVCLANTVTUNERAVIN_H
 
-extern AVCLanTVTunerAVin avcLanTVTunerAVin;
+extern AVCLanTVTunerAVin avclanDevice;

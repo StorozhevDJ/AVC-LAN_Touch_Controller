@@ -1,9 +1,7 @@
 /*
-  AVCLanDrv.cpp - AVCLan DVD changer library for 'duino / Wiring
-  Created by Kochetkov Aleksey, 04.08.2010
-  Modified by Podmoskovny Dmitry, September 2013
-  Edit by Storozhev Denis 23/07/2020
-  Version 0.2.4
+  AVCLanTVTunerAVin.cpp - AVCLan TV tuner + AV input library
+  Author by Storozhev Denis 03/08/2020
+  Version 0.0.1
 */
 
 #include <avr/pgmspace.h>
@@ -36,7 +34,7 @@ const AvcInMessageTable  mtMain[] PROGMEM = {
 	{ACT_RANDOM_OFF,     0x04, {0x00, 0x25, 0x43, 0xB1}},
 	{ACT_RANDOM_D_ON,    0x04, {0x00, 0x25, 0x43, 0xB3}},
 	{ACT_RANDOM_D_OFF,   0x04, {0x00, 0x25, 0x43, 0xB4}},
-	{ACT_AM_PRESS,       0x05, {0x00, 0x25, 0x32, 0x80, 0x06}}, // AM button from JBL radio (кнопка AM на магнитоле JBL)
+	{ACT_AM_PRESS,       0x05, {0x00, 0x25, 0x32, 0x80, 0x06}}
 
 	// power off 0401015F01
 };
@@ -49,11 +47,15 @@ const AvcInMaskedMessageTable  mtMaskedMain[] PROGMEM = {
 	{ACT_DEVSTATUS_EU, 0x04, {0x00, 0x34, 0x45, 0xE4}, _BV(1)},//*
 	{ACT_LAN_CHECK,    0x04, {0x12, 0x01, 0x20, 0}, _BV(3)}, //*
 	{ACT_PLAY_REQ2,    0x06, {0x00, 0x12, 0x45, 0x42, 0, 0x01}, _BV(4)},
-	{ACT_COORDS,       0x08, {0x00, 0x21, 0x24, 0x78, 0, 0, 0, 0}, 0xF0}, // координаты нажатия, маскированы 4 байта
+    //                | len|       | logic IDs| cmd | x| y| x| y|
+	{ACT_SCREEN,       0x08, {0x00, 0x21, 0x24, 0x78, 0, 0, 0, 0}, 0xF0}, // координаты нажатия, маскированы 4 байта
 	{ACT_STOP_REQ1,    0x05, {0x00, 0x12, 0x43, 0x43, 0}, _BV(4)},
 	{ACT_STOP_REQ2,    0x06, {0x00, 0x12, 0x43, 0x43, 0, 0x00}, _BV(4)},
+    //                | len|       | logic IDs| cmd |  DateTime |  GPS coordinate?   |  unknown  |speed|  unknown |
+    {ACT_GPS_DATA,     0x18, {0x00, 0x58, 0xA0, 0x97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 0}, 0xFFFFF0},
 };
 const byte mtMaskedMainSize = sizeof(mtMaskedMain) / sizeof(AvcInMaskedMessageTable);
+
 
 const AvcInMessageTable  mtSearchHead[] PROGMEM = {
 	{ACT_REGISTER,  0x03, {0x12, 0x01, 0x00}},           // AVC LAN register
@@ -65,9 +67,17 @@ const AvcInMessageTable  mtSearchHead[] PROGMEM = {
 };
 const byte mtSearchHeadSize = sizeof(mtSearchHead) / sizeof(AvcInMessageTable);
 
-const AvcOutMessage CmdInit_0        PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x01, 0x11, 0x13, 0x24, 0x45}};
 const AvcOutMessage CmdReset         PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x00, 0x00, 0x00, 0x00, 0x00}}; // reset AVCLan. This causes HU to send ACT_REGISTER
-const AvcOutMessage CmdRegister      PROGMEM =  {AVC_MSG_DIRECT,     0x06, {0x00, 0x01, 0x12, 0x10, 0x24, 0x45}}; // register CD-changer
+//const AvcOutMessage CmdRegister      PROGMEM =  {AVC_MSG_DIRECT,     0x07, {0x00, 0x01, 0x12, 0x10, 0x24, 0x45, 0x21}}; // register logical device in HU
+//58 5A 8C 59 68 53 B0
+//12 58 28 29 32 60 74 A4 A7 87
+//12 56 58 27 E4 A0 6D 6C 40 64
+//12 49 69 C2 51 58 5E
+//10 58 24 5A 8C 59 68 53 B0
+const AvcOutMessage CmdRegister      PROGMEM =  {AVC_MSG_DIRECT,     0x0D, {0x00, 0x01, 0x12, 0x10, 0x58, 0x24, 0x5A, 0x85, 0x59, 0x6D, 0x57, 0x68, 0xAE}}; // register navi from http://compcar.ru/forum/showthread.php?t=4835&p=70522&viewfull=1#post70522
+//const AvcOutMessage CmdInit_0        PROGMEM =  {AVC_MSG_BROADCAST,  0x05, {0x01, 0x11, 0x13, 0x24, 0x45}};	//Send parameters to HU
+const AvcOutMessage CmdInit_0        PROGMEM =  {AVC_MSG_BROADCAST,  0x09, {0x6D, 0x31, 0xF1, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00}}; // init command from compcar
+
 const AvcOutMessage CmdInit3         PROGMEM =  {AVC_MSG_BROADCAST,  0x14, {0x45, 0x31, 0xF3, 0x00, 0x02, 0x04, 0x06, 0x08, 0x09, 0x0A, 0x0C, 0x15, 0x17, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* init command 3
 const AvcOutMessage CmdDevStatusE0   PROGMEM =  {AVC_MSG_DIRECT,     0x10, {0x00, 0x45, 0, 0xF0, 0x03, 0x10, 0xA0, 0x01, 0x02, 0xF0, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* Device status E0
 const AvcOutMessage CmdDevStatusE2   PROGMEM =  {AVC_MSG_DIRECT,     0x10, {0x00, 0x45, 0, 0xF2, 0x03, 0x10, 0xA0, 0x01, 0x02, 0xF0, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}}; //* Device status E0
@@ -97,20 +107,17 @@ const AvcOutMessage CmdLanStatus5    PROGMEM =  {AVC_MSG_DIRECT,     0x04, {0x00
 
 
 /************************************************************************/
-/* AVCLan DVDchanger  & timer1 init,                                    */
+/* AVCLan TV   & timer1 init,                                    */
 /************************************************************************/
 void AVCLanTVTunerAVin::begin(){
-	avclan.deviceAddress = 0x0230;//0x0208;
-	avclan.BoardDeviceAddress = 0x0190;
+	avclan.deviceAddress = 0x208;//0x0230;
+	avclan.BoardDeviceAddress = 0x0190;//0x0110;// //Device address with AM button / адрес магнитолы, где кнопка АМ
 	// timer1 setup, prescaler factor - 1024
 	TCCR1A = 0;     // normal mode
 	TCCR1B = 5;     // Prescaler /1024
 	TCNT1H = TI1_H; // Load counter value hi
 	TCNT1L = TI1_L;	// Load counter value lo
 	DISABLE_TIMER1_INT;
-	//AZFM_INIT;
-	//cd_min = cd_sec = cd_playmode = 0;
-	//cd_status = stWait;
 	avclan.sendMessage(&CmdInit_0);
 }
 
@@ -135,6 +142,7 @@ if (avclan.headAddress == 0) {
 /************************************************************************/
 /* process action                                                       */
 /************************************************************************/
+bool am;
 void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 	byte r;
 	switch (ActionID) {
@@ -190,16 +198,16 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 		case ACT_AM_PRESS:
 			am=!am;
 			if (am) {
-				bSerial.print("On!");
+				bSerial.print("AmOn!");
 				avclan.sendMessage(&CmdInit_0);
 				avclan.sendMessage(&CmdPlayOk1);
 			}; 
 			if (!am) {
-				bSerial.print("Off!");
-				DISABLE_TIMER1_INT;
+				bSerial.print("AmOff!");
+				/*DISABLE_TIMER1_INT;
 				AZFM_OFF;
 				cd_status = stStop;
-				cd_min = cd_sec = 0;
+				cd_min = cd_sec = 0;*/
 				avclan.sendMessage(&CmdStopOk1);
 				r = avclan.message[4];
 				avclan.loadMessage(&CmdStopOk1);
@@ -209,16 +217,17 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 			};
 		break;
 		// Coordinates calculation
-		case ACT_COORDS:
+		case ACT_SCREEN:
 			x_coord = avclan.message[4];
 			y_coord = avclan.message[5];
 			bSerial.print("Coords X=");
 			bSerial.printHex8(x_coord);
 			bSerial.print("; Y=");
 			bSerial.printHex8(y_coord);
+			bSerial.println();
 		break;
 		// device play
-		case ACT_PLAY_IT:
+		/*case ACT_PLAY_IT:
 			if (cd_status != stPlay || (cd_min == 0 && cd_sec == 0)) {
 				avclan.loadMessage(&CmdPlayOk4);
 				avclan.message[5] = 1;       // cd disk
@@ -231,10 +240,10 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 			ENABLE_TIMER1_INT;
 			AZFM_ON;
 			cd_status = stPlay;
-		break;
+		break;*/
 		// Stop request
 		case ACT_STOP_REQ1:
-		case ACT_STOP_REQ2:
+		/*case ACT_STOP_REQ2:
 			DISABLE_TIMER1_INT;
 			AZFM_OFF;
 			cd_status = stStop;
@@ -245,7 +254,7 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 			avclan.message[4] = r;
 			avclan.sendMessage();
 			avclan.sendMessage(&CmdPlayOk2);
-		break;
+		break;*/
 //			avclan.sendMessage(&CmdStopOk2);
 //			avclan.sendMessage(&CmdInit1);
 //			avclan.loadMessage(&CmdStopOk2);
@@ -282,7 +291,7 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 			avclan.sendMessage();
 		break;
 		// Scan mode on
-		case ACT_SCAN_ON:
+		/*case ACT_SCAN_ON:
 			cd_playmode |= pmScan;
 			sendStatus();
 		break;
@@ -340,6 +349,31 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 		case ACT_RANDOM_D_OFF:                             
 			cd_playmode &= ~pmRandomD;
 			sendStatus();
+		break;*/
+		case ACT_GPS_DATA:
+		uint8_t tmp1 = avclan.message[4];
+		uint8_t tmp2 = avclan.message[5];
+		uint8_t tmp3 = avclan.message[6];
+		uint8_t tmp4 = avclan.message[7];
+		uint8_t year = (tmp1 >> 3) - 10;
+		uint8_t mon  = ((tmp1 & 0x07) << 1) | (tmp2 >> 7);
+		uint8_t day  = ((tmp2 & 0x7C) >> 2);
+		uint8_t hour = ((tmp2 & 0x03) << 3) | (tmp3 >> 5);
+		uint8_t min  = ((tmp3 & 0x1F) << 1) | ((tmp4 & 0x80) >> 7);
+		uint8_t sec = ((tmp4 & 0x7e) >> 1);
+		bSerial.print("GPS Date Time: 20");
+		bSerial.printDec(year - 10);
+		bSerial.print("/");
+		bSerial.printDec(mon);
+		bSerial.print("/");
+		bSerial.printDec(day);
+		bSerial.print(" ");
+		bSerial.printDec(hour);
+		bSerial.print(":");
+		bSerial.printDec(min);
+		bSerial.print(":");
+		bSerial.printDec(sec);
+		bSerial.println();
 		break;
 	}
 };
@@ -352,7 +386,7 @@ void AVCLanTVTunerAVin::processAction(AvcActionID ActionID){
 void AVCLanTVTunerAVin::processEvent(AvcEventID EventID){
 	switch (EventID){
 		case EV_STATUS:
-			sendStatus();
+			//sendStatus();
 			avclan.event &= ~EV_STATUS;
 			break;
 	}
@@ -363,7 +397,7 @@ void AVCLanTVTunerAVin::processEvent(AvcEventID EventID){
 /************************************************************************/
 /* send DVD-changer status to head                                      */
 /************************************************************************/
-byte AVCLanTVTunerAVin::sendStatus(){
+/*byte AVCLanTVTunerAVin::sendStatus(){
 	avclan.loadMessage(&CmdPlayStatus);
 	avclan.message[4] = cd_status;   // cd changer status: 10-play, 80-load, 01-open, 02=err1, 03-wait
 	avclan.message[5] = 1;           // cd disk
@@ -373,7 +407,7 @@ byte AVCLanTVTunerAVin::sendStatus(){
 	avclan.message[9] = cd_playmode; // play mode: 0-normal, 2-disc rand, 4-rand, 8-disc repeat, 10-repeat, 20-disc scan, 40-scan
 	
 	return avclan.sendMessage();
-}
+}*/
 
 
 

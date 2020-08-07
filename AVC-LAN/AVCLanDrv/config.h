@@ -34,10 +34,10 @@
 #define DATAIN		1
 
 // LED connected to digital pin 13
-#define LED_DDR		DDRB
-#define LED_PORT	PORTB
-#define	LED_PIN		PINB
-#define LED_OUT		5
+#define LED_AVCLAN_DDR		DDRB
+#define LED_AVCLAN_PORT		PORTB
+#define	LED_AVCLAN_PIN		PINB
+#define LED_AVCLAN_OUT		5
 
 // AZFM board activate
 #define AZFM_INIT
@@ -63,11 +63,17 @@
 #define	DATAIN_PIN	PINF
 #define DATAIN		4
 
-// LED connected to digital pin 24
-#define LED_DDR		DDRD
-#define LED_PORT	PORTD
-#define	LED_PIN		PIND
-#define LED_OUT		5
+// LED connected to indicate AVC-LAN receive
+#define LED_AVCLAN_DDR		DDRD
+#define LED_AVCLAN_PORT		PORTD
+#define	LED_AVCLAN_PIN		PIND
+#define LED_AVCLAN_OUT		5
+#define LED_AVCLAN_BIT		(1<<LED_AVCLAN_OUT)
+// LED connected to indicate link with PC
+#define LED_PC_DDR		DDRD
+#define LED_PC_PORT		PORTD
+#define	LED_PC_PIN		PIND
+#define LED_PC_OUT		0
 
 // AZFM board activate
 #define AZFM_INIT
@@ -92,10 +98,10 @@
 #define DATAIN		0
 
 // LED connected to digital pin 13
-#define LED_DDR		DDRC
-#define LED_PORT	PORTC
-#define	LED_PIN		PINC
-#define LED_OUT		0
+#define LED_AVCLAN_DDR		DDRC
+#define LED_AVCLAN_PORT	PORTC
+#define	LED_AVCLAN_PIN		PINC
+#define LED_AVCLAN_OUT		0
 
 // AZFM board activate
 #define AZFM_DDR	DDRD
@@ -124,10 +130,10 @@
 #define DATAIN		7
 
 // LED connected to digital pin 13
-#define LED_DDR		DDRB
-#define LED_PORT	PORTB
-#define	LED_PIN		PINB
-#define LED_OUT		5
+#define LED_AVCLAN_DDR		DDRB
+#define LED_AVCLAN_PORT		PORTB
+#define	LED_AVCLAN_PIN		PINB
+#define LED_AVCLAN_OUT		5
 
 // AZFM board activate
 #define AZFM_INIT

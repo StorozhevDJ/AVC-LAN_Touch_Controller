@@ -57,8 +57,8 @@ extern "C" {
 	} TE_ee_map;*/
 
 
-#define LED_ON		cbi(LED_PORT, LED_OUT);
-#define LED_OFF	sbi(LED_PORT, LED_OUT);
+#define LED_ON		cbi(LED_AVCLAN_PORT, LED_AVCLAN_OUT);
+#define LED_OFF	sbi(LED_AVCLAN_PORT, LED_AVCLAN_OUT);
 
 
 

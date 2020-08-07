@@ -67,7 +67,7 @@ void BuffSerial::sendByte(uint8_t data){
 	if (txFull){
 		txOverflow++;
 	}else{
-		/* Отключил для проверки мешает ли передача UART приему по AVC-Lan или нет (пропуски пакетов из-за торомозов во время передачи)
+		// Отключал для проверки мешает ли передача UART приему по AVC-Lan или нет (пропуски пакетов из-за торомозов во время передачи), похоже принина в USB
 		//uint8_t oldSREG = SREG;
 		cli();	//disable interrupt (global)
 		if (txEnd != txBegin || (UCSR1A & _BV(UDRE1)) == 0){	//Check if buffer not empty or if USART Data Register Empty
@@ -78,7 +78,7 @@ void BuffSerial::sendByte(uint8_t data){
 		}else{
 			UDR1 = data;	//Start transmit first byte from buffer
 		}
-		sei();	//enable global interrupt*/
+		sei();	//enable global interrupt
 		//SREG = oldSREG;//тут происходил сброс
 		sendUsbTermianlByte(data);
 	}

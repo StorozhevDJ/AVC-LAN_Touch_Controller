@@ -79,7 +79,7 @@ int main(void)
 
 void SetupHardware()
 {
-	//LED port Init
+	//LED port Init to output
 	DDRB |= (1<<0);	
 	DDRD |= (1<<5);
 	
